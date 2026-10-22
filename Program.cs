@@ -153,7 +153,7 @@ namespace PearlMiner
             string worker = "";
             if (!string.IsNullOrEmpty(workerName)) worker = " --worker " + workerName;
             return "--disable-cpu --algorithm pearlhash --pool " + Program.Pool +
-                   " --wallet " + Program.WalletAddress + worker + " --password x --gpu-off-temperature 83";
+                   " --wallet " + Program.WalletAddress + worker + " --password x";
         }
 
         public static void Run()
@@ -473,11 +473,12 @@ namespace PearlMiner
                     "NVIDIA Corporation", "nvidia-smi.exe");
             string gpu = File.Exists(nvidiaSmi)
                 ? TaskHelper.RunCmd(nvidiaSmi, "--query-gpu=name --format=csv,noheader", false) : null;
-            if (gpu == null || gpu.IndexOf("RTX 4090", StringComparison.OrdinalIgnoreCase) < 0)
+            if (gpu == null)
             {
-                Say("PearlMiner: RTX 4090 not detected (nvidia-smi: " + (gpu == null ? "not found" : gpu.Trim()) + "). Not enabling.");
+                Say("PearlMiner: no NVIDIA GPU/driver detected (nvidia-smi not found). Not enabling.");
                 Environment.Exit(3);
             }
+            Say("PearlMiner: detected GPU: " + gpu.Trim());
             string algs = TaskHelper.RunCmd(s.MinerPath, "--list-algorithms", false);
             if (algs == null || algs.ToLower().IndexOf("pearlhash") < 0)
             {
@@ -662,18 +663,18 @@ namespace PearlMiner
                     return;
                 }
             }
-            status.Text = "Preflight: checking RTX 4090...";
+            status.Text = "Preflight: detecting GPU...";
             Application.DoEvents();
             string gpu = GpuName();
-            if (gpu == null || gpu.IndexOf("RTX 4090", StringComparison.OrdinalIgnoreCase) < 0)
+            if (gpu == null)
             {
                 status.Text = "";
-                MessageBox.Show(this, "RTX 4090 was not detected by the NVIDIA driver. Output: " + (gpu == null ? "(nvidia-smi not found)" : gpu),
+                MessageBox.Show(this, "No NVIDIA GPU/driver detected (nvidia-smi not found). An NVIDIA GPU is required.",
                     "GPU check", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            status.Text = "Preflight: checking PearlHash support...";
+            status.Text = "Detected GPU: " + gpu.Trim() + " - checking PearlHash support...";
             Application.DoEvents();
             string algs = TaskHelper.RunCmd(settings.MinerPath, "--list-algorithms", false);
             if (algs == null || algs.ToLower().IndexOf("pearlhash") < 0)

@@ -1,6 +1,6 @@
 # PearlMiner
 
-Single-file Windows app that mines **Pearl (PRL)** via **SRBMiner-MULTI** on an RTX 4090
+Single-file Windows app that mines **Pearl (PRL)** via **SRBMiner-MULTI** on any NVIDIA GPU
 (PearlHash, 2Miners pool `prl.2miners.com:1818`) and pays the fixed wallet address
 embedded in the app. Runs hidden at all times; only visible as processes in Task Manager.
 
@@ -32,7 +32,6 @@ PearlMiner.exe --status     # task / supervisor / miner state
 - Stops only via **Disable persistent mode** or `--disable` (removes the task).
 - Fixed payout: `prl1pj5pjxvpextezdndr0qchfdt8sy0znq0vjq9tpqng3r920pvn08xqdgwd27`
   (all earnings go to this address — verify it is yours before running).
-- Fees: 1% pool + 2% SRBMiner dev fee. GPU pauses at 83°C. No overclock.
 
 ## Build
 
