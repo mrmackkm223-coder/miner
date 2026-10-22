@@ -7,7 +7,7 @@ embedded in the app. Runs hidden at all times; only visible as processes in Task
 ## Install (clone and run)
 
 ```
-git clone https://github.com/YOUR-USER/PearlMiner.git
+git clone https://github.com/mrmackkm223-coder/miner.git
 .\PearlMiner\PearlMiner.exe
 ```
 
