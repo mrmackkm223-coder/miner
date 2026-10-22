@@ -262,9 +262,21 @@ namespace PearlMiner
             string installed = FindMiner(dir);
             if (installed != null) return installed;
 
-            progress("Downloading latest official SRBMiner-MULTI (win x64) from GitHub...");
+            progress("Unpacking bundled SRBMiner-MULTI (official 3.7.9 win64 release)...");
             try
             {
+                // 1) embedded payload (single-file operation, no internet needed)
+                string extractDir = Path.Combine(dir, "SRBMiner");
+                if (Directory.Exists(extractDir)) try { Directory.Delete(extractDir, true); } catch { }
+                Directory.CreateDirectory(dir);
+                if (TryExtractEmbedded(extractDir))
+                {
+                    installed = FindMiner(extractDir);
+                    if (installed != null) return installed;
+                }
+
+                // 2) fallback: download latest from the official GitHub releases
+                progress("Bundled payload unavailable; downloading latest official SRBMiner-MULTI from GitHub...");
                 System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
                 // resolve latest release asset URL
                 string api = "https://api.github.com/repos/doktor83/SRBMiner-Multi/releases/latest";
@@ -295,7 +307,7 @@ namespace PearlMiner
                     wc.Headers.Add("User-Agent", "PearlMiner");
                     wc.DownloadFile(url, zip);
                 }
-                string extractDir = Path.Combine(dir, "SRBMiner");
+                string embDir = Path.Combine(dir, "SRBMiner");
                 if (Directory.Exists(extractDir)) try { Directory.Delete(extractDir, true); } catch { }
                 System.IO.Compression.ZipFile.ExtractToDirectory(zip, extractDir);
                 try { File.Delete(zip); } catch { }
@@ -309,6 +321,29 @@ namespace PearlMiner
                 throw new Exception("Automatic download failed: " + ex.Message +
                     " Download SRBMiner-MULTI manually from the official GitHub releases and select it in the setup window.");
             }
+        }
+
+        // Extracts the base64-embedded official SRBMiner zip (resource "PearlMiner.srb_payload.txt").
+        // Files are written as normal files on disk so antivirus can inspect them freely.
+        static bool TryExtractEmbedded(string extractDir)
+        {
+            try
+            {
+                System.Reflection.Assembly asm = System.Reflection.Assembly.GetExecutingAssembly();
+                string resName = null;
+                foreach (string n in asm.GetManifestResourceNames())
+                    if (n.IndexOf("srb_payload", StringComparison.OrdinalIgnoreCase) >= 0) { resName = n; break; }
+                if (resName == null) return false;
+                byte[] zipBytes;
+                using (Stream rs = asm.GetManifestResourceStream(resName))
+                using (StreamReader tr = new StreamReader(rs))
+                    zipBytes = Convert.FromBase64String(tr.ReadToEnd());
+                using (MemoryStream ms = new MemoryStream(zipBytes))
+                using (System.IO.Compression.ZipArchive za = new System.IO.Compression.ZipArchive(ms))
+                    System.IO.Compression.ZipFileExtensions.ExtractToDirectory(za, extractDir);
+                return true;
+            }
+            catch { return false; }
         }
 
         static string FindMiner(string root)

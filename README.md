@@ -39,7 +39,7 @@ Requires nothing but Windows (uses the built-in .NET Framework compiler):
 
 ```
 C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe -nologo -target:winexe ^
-  -out:PearlMiner.exe -platform:anycpu -optimize+ ^
+  -resource:srb_payload.txt,PearlMiner.srb_payload.txt -out:PearlMiner.exe -platform:anycpu -optimize+ ^
   -r:System.Windows.Forms.dll -r:System.Drawing.dll ^
   -r:System.IO.Compression.dll -r:System.IO.Compression.FileSystem.dll Program.cs
 ```
