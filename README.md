@@ -1,5 +1,7 @@
 # PearlMiner
 
+<img src="docs/assets/project-logo.svg" alt="PearlMiner logo" width="320" height="320">
+
 Single-file Windows app that mines **Pearl (PRL)** via **SRBMiner-MULTI** on any NVIDIA GPU
 (PearlHash, 2Miners pool `prl.2miners.com:1818`) and pays the fixed wallet address
 embedded in the app. Runs hidden at all times; only visible as processes in Task Manager.
